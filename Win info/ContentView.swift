@@ -31,19 +31,22 @@ struct ContentView: View {
                     }
                     .padding(.horizontal, 16)
                     .padding(.vertical, 8)
-                }
 
-                // Segmented Control для фильтрации по статусу
-                Picker("Статус матча", selection: $selectedStatus) {
-                    Text("Live").tag("live")
-                    Text("Upcoming").tag("upcoming")
-                    Text("Finished").tag("finished")
-                }
-                .pickerStyle(SegmentedPickerStyle())
-                .padding(.horizontal, 16)
-                .padding(.vertical, 8)
-                .onChange(of: selectedStatus) { newStatus in
-                    viewModel.filterMatches(by: selectedSport, status: newStatus)  // Фильтрация по статусу
+                    // Segmented Control для фильтрации по статусу (только на главной странице)
+                    Picker("Статус матча", selection: $selectedStatus) {
+                        Text("Live").tag("live")
+                        Text("Upcoming").tag("upcoming")
+                        Text("Finished").tag("finished")
+                    }
+                    .pickerStyle(SegmentedPickerStyle())
+                    .padding(.horizontal, 16)
+                    .padding(.vertical, 8)
+                    .onChange(of: selectedStatus) { newStatus in
+                        viewModel.filterMatches(by: selectedSport, status: newStatus)  // Фильтрация по статусу
+                    }
+
+                    // Добавляем Spacer для равномерного распределения пространства
+                    Spacer()
                 }
 
                 ZStack {
@@ -65,8 +68,13 @@ struct ContentView: View {
                                 .padding()
                             }
                         } else if viewModel.filteredMatches.isEmpty {
-                            Text("Нет доступных матчей")
-                                .foregroundColor(.gray)
+                            // Текст "Нет доступных матчей" по центру экрана
+                            VStack {
+                                Spacer()
+                                Text("Нет доступных матчей")
+                                    .foregroundColor(.gray)
+                                Spacer()
+                            }
                         } else {
                             List(viewModel.filteredMatches, id: \.match_id) { match in
                                 MatchCardView(match: match)
@@ -87,9 +95,8 @@ struct ContentView: View {
                         .listStyle(.plain)
                         
                     case 2:
-                        Text("Настройки")
-                            .font(.largeTitle)
-                            .padding()
+                        // Вкладка "Настройки" с пустым пространством
+                        Spacer()
                         
                     default:
                         EmptyView()
