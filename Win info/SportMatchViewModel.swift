@@ -124,7 +124,7 @@ class SportMatchViewModel: ObservableObject {
         DispatchQueue.main.async { [weak self] in
             guard let self = self else { return }
             self.tennisMatches = self.sortMatches(newMatches)
-            self.filterMatches(by: "tennis") // Всегда показываем теннис по умолчанию
+            self.filterMatches(by: "tennis", status: "live")  // По умолчанию показываем live матчи
             self.isLoading = false
         }
     }
@@ -134,7 +134,7 @@ class SportMatchViewModel: ObservableObject {
             guard let self = self else { return }
             self.basketballMatches = self.sortMatches(newMatches)
             if self.filteredMatches.first?.sport_type == "basketball" {
-                self.filterMatches(by: "basketball")
+                self.filterMatches(by: "basketball", status: "live")  // По умолчанию показываем live матчи
             }
             self.isLoading = false
         }
@@ -164,17 +164,21 @@ class SportMatchViewModel: ObservableObject {
         return liveMatches + sortedUpcomingMatches + sortedFinishedMatches
     }
     
-    func filterMatches(by sportType: String) {
+    func filterMatches(by sportType: String, status: String) {
+        let allMatches: [SportMatch]
         switch sportType {
         case "tennis":
-            filteredMatches = sortMatches(tennisMatches)
+            allMatches = tennisMatches
         case "basketball":
-            filteredMatches = sortMatches(basketballMatches)
+            allMatches = basketballMatches
         case "football":
-            filteredMatches = sortMatches(footballMatches)
+            allMatches = footballMatches
         default:
-            filteredMatches = []
+            allMatches = []
         }
+        
+        // Фильтруем матчи по статусу
+        filteredMatches = allMatches.filter { $0.status == status }
     }
     
     private func getDateFromMatch(_ match: SportMatch) -> Date {

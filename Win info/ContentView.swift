@@ -5,30 +5,45 @@ struct ContentView: View {
     @StateObject private var favoritesManager = FavoritesManager()
     @State private var selectedSport: String = "tennis"
     @State private var selectedTab: Int = 0
+    @State private var selectedStatus: String = "live"  // Новое состояние для Segmented Control
 
     var body: some View {
         NavigationView {
             VStack(spacing: 0) {
                 if selectedTab == 0 {
+                    // Вкладки переключения видов спорта
                     HStack {
                         SportButton(title: "Теннис", sportType: "tennis", selectedSport: $selectedSport) {
-                            viewModel.filterMatches(by: "tennis")
+                            viewModel.filterMatches(by: "tennis", status: selectedStatus)
                         }
 
                         Spacer()
 
                         SportButton(title: "Футбол", sportType: "football", selectedSport: $selectedSport) {
-                            viewModel.filterMatches(by: "football")
+                            viewModel.filterMatches(by: "football", status: selectedStatus)
                         }
 
                         Spacer()
 
                         SportButton(title: "Баскетбол", sportType: "basketball", selectedSport: $selectedSport) {
-                            viewModel.filterMatches(by: "basketball")
+                            viewModel.filterMatches(by: "basketball", status: selectedStatus)
                         }
                     }
                     .padding(.horizontal, 16)
                     .padding(.vertical, 8)
+                }
+
+                // Segmented Control для фильтрации по статусу
+                Picker("Статус матча", selection: $selectedStatus) {
+                    Text("Live").tag("live")
+                    Text("Upcoming").tag("upcoming")
+                    Text("Finished").tag("finished")
+                }
+                .pickerStyle(SegmentedPickerStyle())
+                .padding(.horizontal, 16)
+                .padding(.vertical, 8)
+                .onChange(of: selectedStatus) { newStatus in
+                    viewModel.filterMatches(by: selectedSport, status: newStatus)  // Фильтрация по статусу
                 }
 
                 ZStack {
